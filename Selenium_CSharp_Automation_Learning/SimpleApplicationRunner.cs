@@ -1,5 +1,6 @@
 // using classess from Selenium and WebdriverManager
 
+using System.Linq.Expressions;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome; //->for Chrome
 using OpenQA.Selenium.Safari;
@@ -16,7 +17,7 @@ public class SimpleApplicationRunner
     {
         //I merge all test case's in one file 
         //choose which test to run
-        UIInputTest();
+        amazonUITask();
     }
 
     public static void chromeSafari()
@@ -68,6 +69,7 @@ public class SimpleApplicationRunner
         );
 
         IWebDriver driver = new ChromeDriver();
+        driver.Manage().Window.Maximize(); // to maximize chrome window
 
         try
         {
@@ -143,5 +145,53 @@ public class SimpleApplicationRunner
        
         
     }
+// 12-> Task1 - UI Interaction on amazon
+
+    public static void amazonUITask()
+    {
+        new DriverManager().SetUpDriver(new ChromeConfig(), VersionResolveStrategy.MatchingBrowser);
+        IWebDriver driver = new ChromeDriver();
+        driver.Manage().Window.Maximize();
+        try
+        {
+            driver.Navigate().GoToUrl("https://www.amazon.de/");
+            Console.WriteLine("Amazom Opened.");
+
+            //IWebElement searchBox = driver.FindElement(By.CssSelector("#twotabsearchtextbox"));
+            //searchBox.Click();
+
+            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+            // Wait directly for the actual search input
+            IWebElement searchInput = wait.Until(d =>
+            {
+                IWebElement element = d.FindElement(
+                    By.Id("twotabsearchtextbox")
+                );
+
+                return element.Displayed && element.Enabled ? element : null;
+            });
+
+
+            searchInput.SendKeys("Iphone");
+            Console.WriteLine("Text sent ");
+            Thread.Sleep(2000);
+
+            searchInput.SendKeys(Keys.Enter);
+            Console.WriteLine("Enter pressed");
+            Thread.Sleep(3000);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("ERROR:");
+            Console.WriteLine(ex.Message);
+        }
+        finally
+        {
+            driver.Quit();
+        }
+
+    }
+    
+// 14- NUnit Assertions    
 
 }
